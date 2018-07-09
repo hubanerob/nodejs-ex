@@ -8,15 +8,17 @@
       "description": "An example Node.js application with a MongoDB database. For more information about using this template, including OpenShift considerations, see https://github.com/openshift/nodejs-ex/blob/master/README.md.\n\nWARNING: Any data stored will be lost upon pod destruction. Only use this template for testing.",
       "tags": "quickstart,nodejs",
       "iconClass": "icon-nodejs",
-      "template.openshift.io/long-description": "This template defines resources needed to develop a NodeJS application, including a build configuration, application deployment configuration, and database deployment configuration.  The database is stored in non-persistent storage, so this configuration should be used for experimental purposes only.",
-      "template.openshift.io/provider-display-name": "Red Hat, Inc.",
-      "template.openshift.io/documentation-url": "https://github.com/openshift/nodejs-ex",
-      "template.openshift.io/support-url": "https://access.redhat.com"
+      "openshift.io/long-description": "This template defines resources needed to develop a NodeJS application, including a build configuration, application deployment configuration, and database deployment configuration.  The database is stored in non-persistent storage, so this configuration should be used for experimental purposes only.",
+      "openshift.io/provider-display-name": "Red Hat, Inc.",
+      "openshift.io/documentation-url": "https://github.com/openshift/nodejs-ex",
+      "openshift.io/support-url": "https://access.redhat.com",
+      "template.openshift.io/bindable": "false"
     }
   },
   "message": "The following service(s) have been created in your project: ${NAME}, ${DATABASE_SERVICE_NAME}.\n\nFor more information about using this template, including OpenShift considerations, see https://github.com/openshift/nodejs-ex/blob/master/README.md.",
   "labels": {
-    "template": "nodejs-mongodb-example"
+      "template": "nodejs-mongodb-example",
+      "app": "nodejs-mongodb-example"
   },
   "objects": [
     {
@@ -58,10 +60,7 @@
       "kind": "Route",
       "apiVersion": "v1",
       "metadata": {
-        "name": "${NAME}",
-        "annotations": {
-          "template.openshift.io/expose-uri": "http://{.spec.host}{.spec.path}"
-        }
+        "name": "${NAME}"
       },
       "spec": {
         "host": "${APPLICATION_DOMAIN}",
@@ -106,7 +105,7 @@
             "from": {
               "kind": "ImageStreamTag",
               "namespace": "${NAMESPACE}",
-              "name": "nodejs:6"
+              "name": "nodejs:${NODEJS_VERSION}"
             },
             "env": [
               {
@@ -241,7 +240,7 @@
                   "timeoutSeconds": 3,
                   "initialDelaySeconds": 3,
                   "httpGet": {
-                    "path": "/pagecount",
+                    "path": "/",
                     "port": 8080
                   }
                 },
@@ -249,7 +248,7 @@
                   "timeoutSeconds": 3,
                   "initialDelaySeconds": 30,
                   "httpGet": {
-                    "path": "/pagecount",
+                    "path": "/",
                     "port": 8080
                   }
                 },
@@ -311,7 +310,7 @@
               "from": {
                 "kind": "ImageStreamTag",
                 "namespace": "${NAMESPACE}",
-                "name": "mongodb:3.2"
+                "name": "mongodb:${MONGODB_VERSION}"
               }
             }
           },
@@ -432,6 +431,20 @@
       "description": "The OpenShift Namespace where the ImageStream resides.",
       "required": true,
       "value": "openshift"
+    },
+    {
+      "name": "NODEJS_VERSION",
+      "displayName": "Version of NodeJS Image",
+      "description": "Version of NodeJS image to be used (6, 8, or latest).",
+      "value": "8",
+      "required": true
+    },
+    {
+      "name": "MONGODB_VERSION",
+      "displayName": "Version of MongoDB Image",
+      "description": "Version of MongoDB image to be used (3.2, 3.4, or latest).",
+      "value": "3.4",
+      "required": true
     },
     {
       "name": "MEMORY_LIMIT",
